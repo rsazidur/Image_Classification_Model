@@ -1,11 +1,13 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow import keras
 from tensorflow.keras import models
 import streamlit as st
+from PIL import Image
 
 model = models.load_model('Image_classify.keras')
-data_cat = [
+
+# Category labels
+data_fruit = [
     'apple',
  'banana',
  'beetroot',
@@ -44,18 +46,26 @@ data_cat = [
  'watermelon'
 ]
 
-img_height = 180
-img_width = 180
-image = st.text_input('Enter Image name', 'Chilli.jpg')
-st.header('Image Classification Model')
+st.title('🍎🥦 Image Classification Model')
+st.write('Upload a picture of a fruit or vegetable to identify it.')
 
-image_load = tf.keras.utils.load_img(image, target_size=(img_height, img_width))
-img_arr = tf.keras.utils.img_to_array(image_load)
-img_bat = tf.expand_dims(img_arr, 0)
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-predict = model.predict(img_bat)
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption='Uploaded Image', use_container_width=True)  # Updated here
 
-score = tf.nn.softmax(predict)
-st.image(image)
-st.write(f'Veg/Fruit in image is: {data_cat[np.argmax(score)]}')
-st.write(f'With accuracy of: {np.max(score) * 100:.2f}%')
+    img_height = 180
+    img_width = 180
+    image = image.resize((img_width, img_height))
+    img_array = tf.keras.utils.img_to_array(image)
+    img_batch = tf.expand_dims(img_array, 0)
+
+    prediction = model.predict(img_batch)
+    score = tf.nn.softmax(prediction[0])
+
+    predicted_class = data_fruit[np.argmax(score)]
+    confidence = np.max(score) * 100
+
+    st.markdown(f"### 🍎🥦 Predicted vegetable/fruit is: **{predicted_class.capitalize()}**")
+    st.markdown(f"### ✅ With accuracy of: **{confidence:.2f}%**")
