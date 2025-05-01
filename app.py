@@ -4,7 +4,7 @@ from tensorflow import keras
 from tensorflow.keras import models
 import streamlit as st
 
-model = models.load_model('K:\Machine Learning\Project\Image_classify.keras')
+model = models.load_model('Image_classify.keras')
 data_cat = [
     'apple',
  'banana',
